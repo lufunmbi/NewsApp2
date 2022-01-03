@@ -1,0 +1,46 @@
+﻿@page "/latestNews"
+@using NewsApp2.Models;
+<h3>LatestNews</h3>
+<h3>@strFeedBack </h3>
+<div class="col col-sm" style="border-color:black; border-radius:10px">
+    <label>Country Short Code:</label>
+    <input @bind-value="@CountryToSearch" />
+    <button class="btn-outline-primary" @onclick="TheButtonClicked">Search</button>
+</div>
+
+<div class="card" style="width: 18rem;">
+    @foreach (resultsObj res in newsModel.results)
+    {
+        <img src=@res.image_url class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class=@res.title>Card title</h5>
+            <p class="card-text">@res.content</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    }
+
+</div>
+
+@code {
+    string CountryToSearch = "us";
+    LatestNewsModel newsModel = new LatestNewsModel();
+    //LatestNewsModel newsModel = new LatestNewsModel();
+    string strFeedBack = "";
+
+    private async void TheButtonClicked()
+    {
+        try
+        {
+            HttpClient clnt = new HttpClient();
+
+            newsModel = await clnt.GetFromJsonAsync<LatestNewsModel>("https://localhost:44334/api/NewsApp/" + CountryToSearch);
+
+            var testTitle = newsModel.results;
+        }
+        catch (Exception ex)
+        {
+            strFeedBack = ex.Message;
+            StateHasChanged();
+        }
+    }
+}
